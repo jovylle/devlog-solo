@@ -1,23 +1,21 @@
-// src/routes/log/[slug]/+page.server.ts
-import fs from "fs"
-import path from "path"
-import { error } from "@sveltejs/kit"
-import { compile } from "mdsvex"
+import { error } from '@sveltejs/kit';
 
 export async function load({ params }) {
-  const slug = params.slug
-  const filePath = path.resolve(`content/posts/${slug}.md`)
+  const modules = import.meta.glob('/content/posts/*.md', { eager: true });
 
-  if (!fs.existsSync(filePath)) {
-    throw error(404, "Post not found")
-  }
+  const match = Object.entries(modules).find(([path]) =>
+    path.includes(`${params.slug}.md`)
+  );
 
-  const raw = fs.readFileSync(filePath, "utf-8")
-  const compiled = await compile(raw, { filename: slug })
+  if (!match) throw error(404, 'Post not found');
+
+  const [, module]: any = match;
 
   return {
     post: {
-      html: compiled.code,
-    },
-  }
+      slug: params.slug,
+      ...module.metadata,
+      component: module.default
+    }
+  };
 }

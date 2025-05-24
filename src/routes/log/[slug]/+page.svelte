@@ -3,9 +3,11 @@
 </script>
 
 <svelte:head>
-	<title>Devlog | {data.post.title ?? 'Untitled'}</title>
+	<title>{data.post.title} | Devlog</title>
 </svelte:head>
 
-<article class="prose prose-sm max-w-none">
+<article class="prose max-w-none">
+	<h1>{data.post.title}</h1>
+	<p class="text-sm text-gray-500">{data.post.date} — effort {data.post.effort}/5</p>
 	{@html data.post.html}
 </article>
